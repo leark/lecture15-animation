@@ -8,6 +8,8 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.util.HashMap;
+
 /**
  * A basic custom view for drawing on.
  * @author Joel Ross
@@ -23,8 +25,11 @@ public class DrawingView extends View {
 
     //drawing values
     private Paint whitePaint; //drawing variables (pre-defined for speed)
+    private Paint goldPaint;
 
     public Ball ball; //public for easy access
+
+    private HashMap<Integer, Ball> touches;
 
     /**
      * We need to override all the constructors, since we don't know which will be called
@@ -46,6 +51,9 @@ public class DrawingView extends View {
         //set up drawing variables ahead of time
         whitePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         whitePaint.setColor(Color.WHITE);
+
+        goldPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        goldPaint.setColor(Color.rgb(232, 211, 162));
 
     }
 
@@ -90,6 +98,10 @@ public class DrawingView extends View {
 
         canvas.drawCircle(ball.cx, ball.cy, ball.radius, whitePaint); //we can draw directly onto the canvas
 
+        for (int i = 0; i < touches.size(); i++) {
+            canvas.drawCircle(touches.get(i).cx, touches.get(i).cy, touches.get(i).radius, goldPaint);
+        }
+
         for(int x=50; x<viewWidth-50; x++) { //most of the width
             for(int y=100; y<110; y++) { //10 pixels high
                 bmp.setPixel(x, y, Color.YELLOW); //we can also set individual pixels in a Bitmap (like a BufferedImage)
@@ -97,5 +109,13 @@ public class DrawingView extends View {
         }
         canvas.drawBitmap(bmp, 0, 0, null); //and then draw the BitMap onto the canvas.
         //Canvas bmc = new Canvas(bmp); //we can also make a canvas out of a Bitmap to draw on that (like fetching g2d from a BufferedImage) if we don't want to double-buffer
+    }
+
+    public synchronized void addTouch(int id, float x, float y) {
+        touches.put(id, new Ball(x, y, 20));
+    }
+
+    public synchronized void removeTouch(int id) {
+        touches.remove(id);
     }
 }

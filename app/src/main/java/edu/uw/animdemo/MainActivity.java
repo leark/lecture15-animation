@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
 
     private GestureDetectorCompat mDetector;
 
+    private int numFinger;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         radiusAnim = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.animations);
 
         mDetector = new GestureDetectorCompat(this, new MyGestureListener());
+
+        numFinger = 0;
     }
 
     @Override
@@ -51,6 +55,16 @@ public class MainActivity extends AppCompatActivity {
         switch(action) {
             case (MotionEvent.ACTION_DOWN) : //put finger down
                 //Log.v(TAG, "finger down");
+                int pointerIndex = MotionEventCompat.getActionIndex(event);
+                Log.v(TAG, "Pointer index: " + pointerIndex);
+
+                int pointerID = MotionEventCompat.getPointerId(event, pointerIndex);
+                Log.v(TAG, "ID of finger put down: " + pointerID);
+
+                view.addTouch(pointerID, event.getX(pointerIndex), event.getY(pointerIndex) - getSupportActionBar().getHeight());
+
+                numFinger++;
+                Log.v(TAG, numFinger + " fingers touching");
 
                 ObjectAnimator xAnim = ObjectAnimator.ofFloat(view.ball, "x", x);
                 xAnim.setDuration(1000);
@@ -72,8 +86,37 @@ public class MainActivity extends AppCompatActivity {
 //                view.ball.cy = y;
                 return true;
             case (MotionEvent.ACTION_UP) : //lift finger up
+                numFinger--;
+                Log.v(TAG, "Last finger up");
+                pointerID = MotionEventCompat.getPointerId(event, 0);
+                view.removeTouch(pointerID);
+                return true;
             case (MotionEvent.ACTION_CANCEL) : //aborted gesture
             case (MotionEvent.ACTION_OUTSIDE) : //outside bounds
+            case(MotionEvent.ACTION_POINTER_DOWN):
+                pointerIndex = MotionEventCompat.getActionIndex(event);
+                Log.v(TAG, "Pointer index: " + pointerIndex);
+                pointerID = MotionEventCompat.getPointerId(event, pointerIndex);
+                Log.v(TAG, "ID of finger put down: " + pointerID);
+                numFinger++;
+                Log.v(TAG, numFinger + " fingers touching");
+                view.addTouch(pointerID, event.getX(pointerIndex), event.getY(pointerIndex) - getSupportActionBar().getHeight());
+
+                return true;
+            case (MotionEvent.ACTION_POINTER_UP) :
+                pointerIndex = MotionEventCompat.getActionIndex(event);
+                Log.v(TAG, "Pointer index: " + pointerIndex);
+
+                pointerID = MotionEventCompat.getPointerId(event, pointerIndex);
+                Log.v(TAG, "ID of finger lifted: " + pointerID);
+
+                view.removeTouch(pointerID);
+
+                numFinger--;
+                Log.v(TAG, numFinger + " fingers touching");
+
+
+                return true;
             default :
                 return super.onTouchEvent(event);
         }
