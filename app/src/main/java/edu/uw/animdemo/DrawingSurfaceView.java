@@ -179,6 +179,11 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         touches.remove(id);
     }
 
+    public synchronized void moveTouch(int id, float x, float y) {
+        touches.get(id).cx = x;
+        touches.get(id).cy = y;
+    }
+
     /**
      * An inner class representing a runnable that does the drawing. Animation timing could go in here.
      * http://obviam.net/index.php/the-android-game-loop/ has some nice details about using timers to specify animation

@@ -84,6 +84,9 @@ public class MainActivity extends AppCompatActivity {
                 //Log.v(TAG, "finger move");
 //                view.ball.cx = x;
 //                view.ball.cy = y;
+                for(int i = 0; i < event.getPointerCount(); i++) {
+                    view.moveTouch(MotionEventCompat.getPointerId(event, i), event.getX(i), event.getY(i) - getSupportActionBar().getHeight());
+                }
                 return true;
             case (MotionEvent.ACTION_UP) : //lift finger up
                 numFinger--;
